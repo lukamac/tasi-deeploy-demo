@@ -1,0 +1,1 @@
+Deeploy @ git+https://github.com/lukamac/Deeploy.git@fix-pyproject

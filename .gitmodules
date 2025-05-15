@@ -1,0 +1,6 @@
+[submodule "third_party/pulp-nnx"]
+	path = third_party/pulp-nnx
+	url = https://github.com/pulp-platform/pulp-nnx.git
+[submodule "third_party/pulp-nn-mixed"]
+	path = third_party/pulp-nn-mixed
+	url = https://github.com/pulp-platform/pulp-nn-mixed.git

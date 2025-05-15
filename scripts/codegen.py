@@ -5,6 +5,9 @@
 # Simplifications:
 # - fixed platform, deployer, tiling, network
 
+import os
+import shutil
+import subprocess
 from Deeploy.CommonExtensions.DataTypes import int8_t
 from ortools.constraint_solver.pywrapcp import IntVar
 from typing import List, OrderedDict, Union
@@ -19,6 +22,7 @@ from Deeploy.MemoryLevelExtension.MemoryLevels import MemoryHierarchy, MemoryLev
 from Deeploy.Targets.Neureka.Deployer import NeurekaDeployer
 from Deeploy.EngineExtension.NetworkDeployers.EngineColoringDeployer import EngineColoringDeployerWrapper
 from Deeploy.MemoryLevelExtension.OptimizationPasses.MemoryLevelAnnotationPasses import AnnotateIOMemoryLevel, AnnotateDefaultMemoryLevel, AnnotateNeurekaWeightMemoryLevel
+from util import format_c_file
 
 
 L3 = MemoryLevel(name = "L3", neighbourNames = ["L2"], size = 64000000)
@@ -38,7 +42,7 @@ platform = Neureka.MemoryNeurekaPlatform(
 def scheduler(graph: gs.Graph):
     return graph.nodes
 
-graph = gs.import_onnx(onnx.load("network.onnx"))
+graph = gs.import_onnx(onnx.load("../example_network/network.onnx"))
 
 inputTypes = { "input_0": PointerClass(int8_t) }
 
@@ -107,3 +111,62 @@ def _filterSchedule(schedule: List[List[gs.Node]], layerBinding: OrderedDict[str
 schedule = _filterSchedule(_mockScheduler(graph), deployer.layerBinding)
 
 _ = deployer.generateFunction()
+
+output_name = "Network"
+
+network_header = f"""
+#ifndef __DEEPLOY_{output_name.upper()}__
+#define __DEEPLOY_{output_name.upper()}__
+
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+{deployer.generateIncludeString()}
+
+void RunNetwork(uint32_t core_id, uint32_t numThreads);
+void InitNetwork(uint32_t core_id, uint32_t numThread);
+
+{deployer.generateIOBufferInitializationCode()}
+
+#endif  // __DEEPLOY_{output_name.upper()}__
+"""
+
+network_implementation = f"""
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+{deployer.generateIncludeString()}
+
+#include "Network.h"
+
+{deployer.generateBufferInitializationCode()}
+
+{deployer.generateGlobalDefinitionCode()}
+
+void RunNetwork(__attribute__((unused)) uint32_t core_id, __attribute__((unused)) uint32_t numThreads){{
+    {deployer.generateInferenceInitializationCode()}
+    {deployer.generateFunction()}
+}}
+
+void InitNetwork(__attribute__((unused)) uint32_t core_id, __attribute__((unused)) uint32_t numThreads){{
+    {deployer.generateEngineInitializationCode()}
+    {deployer.generateBufferAllocationCode()}
+}}
+"""
+
+gen_dir = "../gen"
+gen_inc_dir = f"{gen_dir}/inc"
+gen_src_dir = f"{gen_dir}/src"
+os.makedirs(gen_inc_dir, exist_ok=True)
+os.makedirs(gen_src_dir, exist_ok=True)
+network_header_file = f"{gen_inc_dir}/{output_name}.h"
+network_implementation_file = f"{gen_src_dir}/{output_name}.c"
+with open(network_header_file, "w") as f:
+    f.write(network_header)
+with open(network_implementation_file, "w") as f:
+    f.write(network_implementation)
+
+format_c_file(network_header_file)
+format_c_file(network_implementation_file)

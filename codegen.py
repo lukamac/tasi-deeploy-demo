@@ -5,9 +5,10 @@
 # Simplifications:
 # - fixed platform, deployer, tiling, network
 
+from Deeploy.CommonExtensions.DataTypes import int8_t
 from ortools.constraint_solver.pywrapcp import IntVar
-from typing import List, Union
-from Deeploy.DeeployTypes import ConstantBuffer, NetworkContext, SubGraph, TransientBuffer
+from typing import List, OrderedDict, Union
+from Deeploy.DeeployTypes import ConstantBuffer, NetworkContext, ONNXLayer, PointerClass, SubGraph, TransientBuffer
 from Deeploy.MemoryLevelExtension.NetworkDeployers.MemoryLevelDeployer import MemoryDeployerWrapper
 from Deeploy.TilingExtension.TilerExtension import Tiler, TilerDeployerWrapper
 from Deeploy.TilingExtension.TilerModel import TilerModel
@@ -39,8 +40,7 @@ def scheduler(graph: gs.Graph):
 
 graph = gs.import_onnx(onnx.load("network.onnx"))
 
-inputTypes = {
-}
+inputTypes = { "input_0": PointerClass(int8_t) }
 
 loweringOptimizer = Neureka.NeurekaOptimizer
 
@@ -51,7 +51,7 @@ deployer = NeurekaDeployer(
     loweringOptimizer,
     scheduler,
     "DeeployNetwork",
-    default_channels_first=True,
+    default_channels_first=False,
     deeployStateDir="deeployState",
 )
 
@@ -84,3 +84,26 @@ deployer = TilerDeployerWrapper(deployer, MyTiler)
 deployer.tiler.visualizeMemoryAlloc = False
 deployer.tiler.memoryAllocStrategy = "TetrisRandom"
 deployer.tiler.searchStrategy = "random-max"
+
+# User provided input types and offsets
+# Offsets are important only for sign prop platforms, which is not the case for the pulp-platform
+# Sign prop platforms are platforms that only implement unsigned kernels and use offsets to implement signed operations
+inputOffsets = { "input_0": 0 }
+
+def _mockScheduler(graph: gs.Graph) -> List[List[gs.Node]]:
+    schedule = [[node] for node in graph.nodes]
+    return schedule
+
+def _filterSchedule(schedule: List[List[gs.Node]], layerBinding: OrderedDict[str, ONNXLayer]) -> List[List[gs.Node]]:
+    filteredSchedule = []
+    for pattern in schedule:
+        filteredSchedulePattern = []
+        for node in pattern:
+            if node.name in layerBinding.keys():
+                filteredSchedulePattern.append(node)
+        filteredSchedule.append(filteredSchedulePattern)
+    return filteredSchedule
+
+schedule = _filterSchedule(_mockScheduler(graph), deployer.layerBinding)
+
+_ = deployer.generateFunction()

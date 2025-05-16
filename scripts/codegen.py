@@ -6,7 +6,7 @@
 # - fixed platform, deployer, tiling, network
 
 import os
-from util import format_c_file
+from Util import format_c_file
 from Deployer import deployer
 
 

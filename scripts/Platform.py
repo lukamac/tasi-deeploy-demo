@@ -10,7 +10,7 @@ L1 = MemoryLevel(name = "L1", neighbourNames = ["L2"], size = 16000)
 
 #memoryHierarchy = MemoryHierarchy([L3, L2, L1, WMEM])
 memoryHierarchy = MemoryHierarchy([L3, L2, L1])
-memoryHierarchy.setDefaultMemoryLevel("L2")
+memoryHierarchy.setDefaultMemoryLevel("L3")
 
 platform = MemoryNeurekaPlatform(
     memoryHierarchy,

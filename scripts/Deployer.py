@@ -10,7 +10,7 @@ from Deeploy.MemoryLevelExtension.OptimizationPasses.MemoryLevelAnnotationPasses
 from Deeploy.TilingExtension.TilerExtension import Tiler, TilerDeployerWrapper
 from Deeploy.TilingExtension.TilerModel import TilerModel
 from ortools.constraint_solver.pywrapcp import IntVar
-from network_info import graph, inputTypes
+from NetworkInfo import graph, inputTypes
 
 
 def scheduler(graph: gs.Graph):

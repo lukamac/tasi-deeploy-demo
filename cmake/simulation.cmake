@@ -19,9 +19,11 @@ macro(add_gvsoc_emulation name target)
 	set(GVSOC_WORKDIR ${CMAKE_BINARY_DIR}/gvsoc_workdir)
 	make_directory(${GVSOC_WORKDIR})
 	set(GVSOC_BINARY "${CMAKE_BINARY_DIR}/${name}")
+	set(GVSOC_COMMAND $ENV{GVSOC} --target=${target} --binary=${GVSOC_BINARY} --work-dir=${GVSOC_WORKDIR} ${GVSOC_EXTRA_FLAGS} image flash run)
+	list(JOIN GVSOC_COMMAND " " GVSOC_COMMAND_STRING)
 	add_custom_target(gvsoc_${name}
 		DEPENDS ${name}
-		COMMAND $ENV{GVSOC} --target=${target} --binary=${GVSOC_BINARY} --work-dir=${GVSOC_WORKDIR} ${GVSOC_EXTRA_FLAGS} image flash run
+		COMMAND echo "${GVSOC_COMMAND_STRING}" && ${GVSOC_COMMAND}
 		COMMENT "Simulating deeploytest ${name} with gvsoc for the target ${target}"
 		POST_BUILD
 		USES_TERMINAL

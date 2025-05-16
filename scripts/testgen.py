@@ -3,7 +3,7 @@ from Deeploy.DeeployTypes import ConstantBuffer, NetworkDeployer, VariableBuffer
 import numpy as np
 import os
 from Deployer import deployer
-from util import format_c_file
+from Util import format_c_file
 
 
 def _shapeBroadcast(ctxt, value, name):
@@ -108,20 +108,10 @@ def generateL3HexDump(deployer: NetworkDeployer, path: str, test_inputs: List, t
         else:
             width = dataType.referencedType.typeWidth
             signed = (dataType.referencedType.typeMin < 0)
-
-            retStr = ""
-
-            if signed:
-                retStr += "int"
-            else:
-                retStr += "uint"
-
-            retStr += str(width)
-
+            retStr = f"{'int' if signed else 'uint'}{width}"
         return retStr, width
 
     def dumpBuffer(buf: VariableBuffer, path: str):
-
         if "input" in buf.name:
             idx = int(buf.name.split("_")[1])
             array = _shapeBroadcast(deployer.ctxt, test_inputs[idx], f"input_{idx}")
@@ -145,6 +135,8 @@ def generateL3HexDump(deployer: NetworkDeployer, path: str, test_inputs: List, t
 
         paddedArray.astype(typeStr).tofile(path)
 
+    # Needed for "extName" annotation
+    _ = deployer.generateBufferAllocationCode()
     # LMACAN: Dump all global buffers with the "extName" attribute
     os.makedirs(path, exist_ok = True)
     for buf in deployer.ctxt.globalObjects.values():

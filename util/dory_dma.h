@@ -45,6 +45,14 @@ void dory_dma_memcpy_3d_async(DMA_copy *copy);
 
 void dory_dma_memcpy_async(DMA_copy *copy);
 
+void dory_dma_memcpy_1d_mindims_async(DMA_copy *copy);
+
+void dory_dma_memcpy_2d_mindims_async(DMA_copy *copy);
+
+void dory_dma_memcpy_3d_mindims_async(DMA_copy *copy);
+
+void dory_dma_memcpy_mindims_async(DMA_copy *copy);
+
 void dory_dma_free(DMA_copy *copy);
 
 void dory_dma_barrier(DMA_copy *copy);

@@ -32,43 +32,21 @@
 #include "bsp/fs/readfs.h"
 #include "bsp/ram.h"
 #include "pmsis.h"
-
-#ifdef USE_HYPERFLASH
 #include "bsp/flash/hyperflash.h"
-typedef struct pi_hyperflash_conf flash_conf_t;
-#define flash_conf_init(conf) pi_hyperflash_conf_init(conf)
-#elif defined USE_SPIFLASH
-#include "bsp/flash/spiflash.h"
-typedef struct pi_spiflash_conf flash_conf_t;
-#define flash_conf_init(conf) pi_spiflash_conf_init(conf)
-#elif defined USE_MRAM
-typedef struct pi_mram_conf flash_conf_t;
-#define flash_conf_init(conf) pi_mram_conf_init(conf)
-#else
-typedef struct pi_default_flash_conf flash_conf_t;
-#define flash_conf_init(conf) pi_default_flash_conf_init(conf)
-#endif
-
-#ifdef USE_HYPERRAM
 #include "bsp/ram/hyperram.h"
-typedef struct pi_hyperram_conf ram_conf_t;
-#define ram_conf_init(conf) pi_hyperram_conf_init(conf)
-#else
-typedef struct pi_default_ram_conf ram_conf_t;
-#define ram_conf_init(conf) pi_default_ram_conf_init(conf)
-#endif
+
 
 #define BUFFER_SIZE 2048 //128
 static uint8_t buffer[BUFFER_SIZE];
 
 static struct pi_device flash;
-static flash_conf_t flash_conf;
+static struct pi_hyperflash_conf flash_conf;
 
 static struct pi_device fs;
 static struct pi_readfs_conf fs_conf;
 
 struct pi_device ram;
-static ram_conf_t ram_conf;
+static struct pi_hyperram_conf ram_conf;
 
 void open_fs() {
   // SCHEREMO: Fix FS
@@ -83,14 +61,14 @@ void open_fs() {
 }
 
 void mem_init() {
-  flash_conf_init(&flash_conf);
+  pi_hyperflash_conf_init(&flash_conf);
   pi_open_from_conf(&flash, &flash_conf);
   if (pi_flash_open(&flash)) {
     printf("ERROR: Cannot open flash! Exiting...\n");
     pmsis_exit(-1);
   }
 
-  ram_conf_init(&ram_conf);
+  pi_hyperram_conf_init(&ram_conf);
   pi_open_from_conf(&ram, &ram_conf);
   if (pi_ram_open(&ram)) {
     printf("ERROR: Cannot open ram! Exiting...\n");

@@ -2,7 +2,7 @@ from typing import List, Dict, Tuple
 from Deeploy.DeeployTypes import ConstantBuffer, NetworkDeployer, VariableBuffer
 import numpy as np
 import os
-from codegen import inputOffsets, inputTypes, deployer
+from Deployer import deployer
 from util import format_c_file
 
 
@@ -22,7 +22,7 @@ def _shapeBroadcast(ctxt, value, name):
     return broadcastNum
 
 
-def generateTestInputsHeader(deployer: NetworkDeployer, test_inputs: List, inputTypes: Dict, inputOffsets: Dict) -> str:
+def generateTestInputsHeader(deployer: NetworkDeployer, test_inputs: List) -> str:
     retStr = ""
     inputNames = [deployer.ctxt.lookup(buf.name) for buf in deployer.graph.inputs]
     inputTypes = {buf.name: buf._type for buf in inputNames}
@@ -35,8 +35,6 @@ def generateTestInputsHeader(deployer: NetworkDeployer, test_inputs: List, input
         # WIESEP: Correctly handle empty arrays
         if np.prod(num.shape) == 0:
             continue
-
-        test_inputs[index] -= inputOffsets[f"input_{index}"]
 
         broadcastNum = _shapeBroadcast(deployer.ctxt, num, f"input_{index}")
 
@@ -73,26 +71,22 @@ def generateTestInputsHeader(deployer: NetworkDeployer, test_inputs: List, input
 
 def generateTestOutputsHeader(deployer: NetworkDeployer,
                               test_outputs: List) -> str:
-    output_signed = {}
-    output_n_levels = {}
-    output_data_type = {}
-
     retStr = ""
 
-    for index, num in enumerate(test_outputs):
-        output_data_type[f"output_{index}"] = deployer.ctxt.lookup(f'output_{index}')._type
-        typeName = output_data_type[f"output_{index}"].referencedType.typeName
-        typeWidth = output_data_type[f"output_{index}"].referencedType.typeWidth
+    for index, values in enumerate(test_outputs):
+        refType = deployer.ctxt.lookup(f'output_{index}')._type.referencedType
+        typeName = refType.typeName
+        typeWidth = refType.typeWidth
 
         retStr += f"#define OUTPUTTYPE {typeName}\n"
         retStr += f"{typeName} testOutputVector{index}[] ="
         retStr += "{"
-        list_str = (", ").join([str(x) for x in num.flatten()])
+        list_str = (", ").join([str(x) for x in values.flatten()])
         # WIESEP: Arrays have to be 4 byte alinged (at lest in banshee)
-        bytes = len(num) * (typeWidth // 8)
+        bytes = len(values) * (typeWidth // 8)
         if bytes % 4 != 0:
             bytes = 4 * int((bytes / 4 + 1))
-            padding = (bytes * 8) // typeWidth - len(num)
+            padding = (bytes * 8) // typeWidth - len(values)
             list_str += ", "
             list_str += (", ").join([str(0)] * padding)
         retStr += list_str
@@ -160,7 +154,7 @@ def generateL3HexDump(deployer: NetworkDeployer, path: str, test_inputs: List, t
 
 
 test_inputs = np.load("../example_network/test_inputs.npz")
-test_inputs_header = generateTestInputsHeader(deployer, list(test_inputs.values()), inputTypes, inputOffsets)
+test_inputs_header = generateTestInputsHeader(deployer, list(test_inputs.values()))
 
 test_outputs = np.load("../example_network/test_outputs.npz")
 test_outputs_header = generateTestOutputsHeader(deployer, list(test_outputs.values()))

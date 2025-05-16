@@ -1,1 +1,3 @@
-Deeploy @ git+https://github.com/lukamac/Deeploy.git@fix-pyproject
+Deeploy @ git+https://github.com/pulp-platform/Deeploy.git@devel
+prettytable
+rich

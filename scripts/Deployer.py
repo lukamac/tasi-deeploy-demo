@@ -1,3 +1,4 @@
+import onnx
 import onnx_graphsurgeon as gs
 from typing import List, Union
 from Platform import platform, memoryHierarchy
@@ -10,7 +11,7 @@ from Deeploy.MemoryLevelExtension.OptimizationPasses.MemoryLevelAnnotationPasses
 from Deeploy.TilingExtension.TilerExtension import Tiler, TilerDeployerWrapper
 from Deeploy.TilingExtension.TilerModel import TilerModel
 from ortools.constraint_solver.pywrapcp import IntVar
-from NetworkInfo import graph, inputTypes
+from NetworkInfo import linear
 
 
 def scheduler(graph: gs.Graph):
@@ -19,9 +20,9 @@ def scheduler(graph: gs.Graph):
 loweringOptimizer = NeurekaOptimizer
 
 deployer = NeurekaDeployer(
-    graph,
+    linear.graph(),
     platform,
-    inputTypes,
+    linear.inputTypes,
     loweringOptimizer,
     scheduler,
     "DeeployNetwork",

@@ -1,9 +1,10 @@
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 from Deeploy.DeeployTypes import ConstantBuffer, NetworkDeployer, VariableBuffer
 import numpy as np
 import os
 from Deployer import deployer
 from Util import format_c_file
+from NetworkInfo import linear
 
 
 def _shapeBroadcast(ctxt, value, name):
@@ -145,10 +146,10 @@ def generateL3HexDump(deployer: NetworkDeployer, path: str, test_inputs: List, t
             dumpBuffer(buf, pathName)
 
 
-test_inputs = np.load("../example_network/test_inputs.npz")
+test_inputs = np.load(linear.test_inputs_path())
 test_inputs_header = generateTestInputsHeader(deployer, list(test_inputs.values()))
 
-test_outputs = np.load("../example_network/test_outputs.npz")
+test_outputs = np.load(linear.test_outputs_path())
 test_outputs_header = generateTestOutputsHeader(deployer, list(test_outputs.values()))
 
 gen_dir = "../gen/test"

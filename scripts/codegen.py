@@ -7,8 +7,11 @@
 
 import os
 from Util import format_c_file
-from Deployer import deployer
+from Deployer import setup_deployer
+from NetworkInfo import linear, iSoftmax
 
+
+deployer = setup_deployer(iSoftmax)
 
 output_name = "Network"
 

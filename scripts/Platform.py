@@ -1,6 +1,10 @@
+from Deeploy.DeeployTypes import NodeMapper
 from Deeploy.MemoryLevelExtension.NetworkDeployers.MemoryLevelDeployer import MemoryDeployerWrapper
 from Deeploy.MemoryLevelExtension.MemoryLevels import MemoryHierarchy, MemoryLevel
+from Deeploy.Targets.Generic.Layers import SoftmaxLayer
 from Deeploy.Targets.Neureka.Platform import MemoryNeurekaPlatform
+from Parsers import ISoftmaxParser
+from TilingReadyBindings import iSoftmaxTilingReadyBindings
 
 L3 = MemoryLevel(name = "L3", neighbourNames = ["L2"], size = 64000000)
 L2 = MemoryLevel(name = "L2", neighbourNames = ["L3", "L1"], size = 512000)
@@ -19,3 +23,6 @@ platform = MemoryNeurekaPlatform(
 )
 
 platform.engines[1].includeList.remove("DeeployBasicMath.h")
+
+iSoftmaxMapper = NodeMapper(ISoftmaxParser(), iSoftmaxTilingReadyBindings)
+platform.engines[1].Mapping['iSoftmax'] = SoftmaxLayer([iSoftmaxMapper])

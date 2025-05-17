@@ -25,3 +25,8 @@ linear = NetworkInfo(
         dir="../networks/linear",
         inputTypes = { "input_0": PointerClass(int8_t) }
 )
+
+iSoftmax = NetworkInfo(
+        dir="../networks/iSoftmax",
+        inputTypes = { "input_0": PointerClass(int8_t) }
+)

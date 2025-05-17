@@ -10,9 +10,9 @@ project(siracusa-network LANGUAGES C ASM)
 include(cmake/pulp-sdk-siracusa.cmake)
 
 add_library(siracusa-network STATIC)
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS gen/src/*.c util/*.c)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS gen/src/*.c util/*.c kernel/*.c)
 target_sources(siracusa-network PRIVATE ${SOURCES})
-target_include_directories(siracusa-network PUBLIC gen/inc util)
+target_include_directories(siracusa-network PUBLIC gen/inc util kernel)
 target_link_libraries(siracusa-network PRIVATE pulp-sdk)
 
 set(PULPNNVERSION XPULPV2)

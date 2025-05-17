@@ -6,3 +6,5 @@ ENV TOOLCHAIN_LLVM_INSTALL_DIR=/app/install/llvm \
     GVSOC=/app/install/gvsoc/bin/gvsoc
 
 RUN pip install git+https://github.com/pulp-platform/Deeploy.git@devel
+
+WORKDIR /demo

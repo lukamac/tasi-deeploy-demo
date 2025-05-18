@@ -1,6 +1,18 @@
-In this demo we will use the prebuilt docker image of Deeploy to circumvent installing the necessary toolchain and emulation.
+## Structure
+
+- `cmake`: extra cmake files
+- `gen`: all the generated files will go here - C and hex files
+- `kernel`: custom C kernel implementations
+- `networks`: onnx networks and test input/output files for code generation
+- `scripts`: python scripts for code and test generation
+- `test`: C files necessary to build a full test app
+- `third_party`: third party libraries
+- `util`: utility C files
+
 
 ## Docker
+
+In this demo we will use the prebuilt docker image of Deeploy to circumvent installing the necessary toolchain and emulation.
 
 ### Building the image
 
@@ -11,7 +23,7 @@ docker build -t tasi-demo .
 ### Executing commands
 
 ```
-docker run --mount type=bind,src=$(pwd),dst=/demo tasi-demo bash -c "<cmd>"
+docker run --rm --tty --mount type=bind,src=$(pwd),dst=/demo tasi-demo bash -c "<cmd>"
 ```
 
 e.g. to make the test:

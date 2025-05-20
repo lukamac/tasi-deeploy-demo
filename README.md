@@ -32,7 +32,13 @@ e.g. to make the test:
 docker run --mount type=bind,src=$(pwd),dst=/demo tasi-demo bash -c "make test"
 ```
 
-## Getting Deeploy
+## Deeploy
+
+[Documentation](https://pulp-platform.github.io/Deeploy/branch/devel/)
+
+Templating language used by Deeploy: [Mako](https://www.makotemplates.org/)
+
+### Getting Deeploy
 
 ```
 pip install git+https://github.com/pulp-platform/Deeploy.git@devel

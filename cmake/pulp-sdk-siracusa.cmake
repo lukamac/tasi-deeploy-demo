@@ -87,18 +87,12 @@ set(SIRACUSA_COMPILE_FLAGS
 
 set(SIRACUSA_INCLUDES
   ${PULP_SDK_HOME}/rtos/pulpos/pulp/include/pos/chips/siracusa
-  ${PULP_SDK_HOME}/rtos/pulpos/pulp/drivers/i3c/include
   ${PULP_SDK_HOME}/rtos/pulpos/pulp/drivers/siracusa_padmux/include
 )
 
 set(PULP_SDK_SIRACUSA_C_SOURCE
   ${PULP_SDK_HOME}/rtos/pulpos/pulp/kernel/chips/siracusa/pll.c
   ${PULP_SDK_HOME}/rtos/pulpos/pulp/kernel/chips/siracusa/soc.c
-  ${PULP_SDK_HOME}/rtos/pulpos/pulp/drivers/i3c/src/cdn_print.c
-  ${PULP_SDK_HOME}/rtos/pulpos/pulp/drivers/i3c/src/command_list.c
-  #${PULP_SDK_HOME}/rtos/pulpos/pulp/drivers/i3c/src/i3c.c
-  ${PULP_SDK_HOME}/rtos/pulpos/pulp/drivers/i3c/src/i3c_obj_if.c
-  ${PULP_SDK_HOME}/rtos/pulpos/pulp/drivers/i3c/src/cps_impl.c
   ${PULP_SDK_HOME}/rtos/pulpos/pulp/drivers/siracusa_padmux/src/siracusa_padctrl.c
 )
 

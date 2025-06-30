@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ghcr.io/pulp-platform/deeploy:main
+FROM ghcr.io/pulp-platform/deeploy:devel
 
 ENV TOOLCHAIN_LLVM_INSTALL_DIR=/app/install/llvm \
     TOOLCHAIN_LLVM_LIBC_DIR=/app/install/llvm/picolibc/riscv/rv32imc \
